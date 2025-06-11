@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>ラテ・コーヒー選択</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <p class="jp">カップをセットしてラテまたはコーヒーのサイズを選んでください</p>
+      <p class="en">Place your cup and choose your latte or coffee size</p>
+    </div>
+    <div class="menu-row">
+      <div class="menu-block hot-latte">
+        <div class="menu-title jp">ホットラテ</div>
+        <div class="menu-title en">HOT LATTE</div>
+        <div class="size-row">
+          <button class="size-btn large">
+            <span class="jp">大</span>
+            <span class="en">Large</span>
+          </button>
+          <button class="size-btn regular">
+            <span class="jp">普通</span>
+            <span class="en">Regular</span>
+          </button>
+        </div>
+      </div>
+      <div class="menu-block hot-coffee">
+        <div class="menu-title jp">ホットコーヒー</div>
+        <div class="menu-title en">HOT COFFEE</div>
+        <div class="size-row">
+          <button class="size-btn large">
+            <span class="jp">大</span>
+            <span class="en">Large</span>
+          </button>
+          <button class="size-btn regular">
+            <span class="jp">普通</span>
+            <span class="en">Regular</span>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="menu-row">
+      <div class="menu-block ice-latte">
+        <div class="menu-title jp">アイスラテ</div>
+        <div class="menu-title en">ICE LATTE</div>
+        <div class="size-row">
+          <button class="size-btn large">
+            <span class="jp">大</span>
+            <span class="en">Large</span>
+          </button>
+          <button class="size-btn regular">
+            <span class="jp">普通</span>
+            <span class="en">Regular</span>
+          </button>
+        </div>
+      </div>
+      <div class="menu-block ice-coffee">
+        <div class="menu-title jp">アイスコーヒー</div>
+        <div class="menu-title en">ICE COFFEE</div>
+        <div class="size-row">
+          <button class="size-btn large">
+            <span class="jp">大</span>
+            <span class="en">Large</span>
+          </button>
+          <button class="size-btn regular">
+            <span class="jp">普通</span>
+            <span class="en">Regular</span>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="strength-row">
+      <button class="strength-btn weak">
+        <span class="jp">薄め</span>
+        <span class="en">Weak</span>
+      </button>
+      <button class="strength-btn normal">
+        <span class="jp">普通</span>
+        <span class="en">Normal</span>
+      </button>
+      <button class="strength-btn strong">
+        <span class="jp">濃いめ</span>
+        <span class="en">Strong</span>
+      </button>
+    </div>
+  </div>
+  <script>
+    // ドリンク選択状態を管理
+    const strengthRow = document.querySelector('.strength-row');
+    const hotCoffeeBtns = document.querySelectorAll('.menu-block.hot-coffee .size-btn');
+    const iceCoffeeBtns = document.querySelectorAll('.menu-block.ice-coffee .size-btn');
+    const hotLatteBtns = document.querySelectorAll('.menu-block.hot-latte .size-btn');
+    const iceLatteBtns = document.querySelectorAll('.menu-block.ice-latte .size-btn');
+    const strengthBtns = document.querySelectorAll('.strength-btn');
+    const allSizeBtns = document.querySelectorAll('.size-btn');
+    const headerJp = document.querySelector('.header .jp');
+    const originalHeaderJp = headerJp.textContent;
+    const headerEn = document.querySelector('.header .en');
+    const originalHeaderEn = headerEn.textContent;
+
+    let brewingTimeoutId = null;
+    let resetTimeoutId = null;
+
+    function clearStrengthRowClass() {
+      strengthRow.classList.remove('hot-coffee', 'ice-coffee', 'hot-latte', 'ice-latte');
+    }
+
+    function clearStrengthGlow() {
+      strengthBtns.forEach(btn => btn.classList.remove('glow'));
+    }
+
+    function clearSelectedSizeBtn() {
+      allSizeBtns.forEach(btn => btn.classList.remove('selected'));
+    }
+
+    function resetToInitialMessage() {
+      headerJp.textContent = originalHeaderJp;
+      headerEn.textContent = originalHeaderEn;
+      clearStrengthRowClass();
+      clearStrengthGlow();
+      allSizeBtns.forEach(btn => btn.classList.remove('selected'));
+      strengthBtns.forEach(b => b.classList.remove('glow'));
+      if (document.activeElement) document.activeElement.blur();
+    }
+
+    function showBrewingMessage() {
+      headerJp.textContent = 'コーヒーを抽出しています…';
+      headerEn.textContent = 'Brewing the coffee…';
+      if (brewingTimeoutId) clearTimeout(brewingTimeoutId);
+      if (resetTimeoutId) clearTimeout(resetTimeoutId);
+      brewingTimeoutId = setTimeout(() => {
+        headerJp.textContent = 'お飲み物ができました。素敵な時間をお過ごしください！';
+        headerEn.textContent = 'Your drinks are ready. Have a great time!';
+        resetTimeoutId = setTimeout(() => {
+          resetToInitialMessage();
+        }, 1500);
+      }, 3000);
+    }
+
+    // すべてのサイズボタンにイベントをつける
+    hotCoffeeBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        clearSelectedSizeBtn();
+        btn.classList.add('selected');
+        clearStrengthRowClass();
+        strengthRow.classList.add('hot-coffee');
+        clearStrengthGlow();
+        setTimeout(() => {
+          strengthBtns.forEach(b => b.classList.add('glow'));
+        }, 500); // 0.5秒後に変更
+        headerJp.textContent = 'コーヒーの濃さを一番下のボタンから選択してください';
+        headerEn.textContent = 'Please select the strength of your coffee from the bottom button';
+      });
+    });
+    iceCoffeeBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        clearSelectedSizeBtn();
+        btn.classList.add('selected');
+        clearStrengthRowClass();
+        strengthRow.classList.add('ice-coffee');
+        clearStrengthGlow();
+        setTimeout(() => {
+          strengthBtns.forEach(b => b.classList.add('glow'));
+        }, 500); // 0.5秒後に変更
+        headerJp.textContent = 'コーヒーの濃さを一番下のボタンから選択してください';
+        headerEn.textContent = 'Please select the strength of your coffee from the bottom button';
+      });
+    });
+    hotLatteBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        clearSelectedSizeBtn();
+        btn.classList.add('selected');
+        clearStrengthRowClass();
+        strengthRow.classList.add('hot-latte');
+        clearStrengthGlow();
+        showBrewingMessage();
+      });
+    });
+    iceLatteBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        clearSelectedSizeBtn();
+        btn.classList.add('selected');
+        clearStrengthRowClass();
+        strengthRow.classList.add('ice-latte');
+        clearStrengthGlow();
+        showBrewingMessage();
+      });
+    });
+
+    // strength-btnクリック時、押したstrength-btnだけglowを付与（他のstrength-btnからのみglowを外す）
+    strengthBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        strengthBtns.forEach(b => b.classList.remove('glow'));
+        btn.classList.add('glow');
+        // ホットコーヒー・アイスコーヒー選択中なら抽出画面に切り替え
+        if (strengthRow.classList.contains('hot-coffee') || strengthRow.classList.contains('ice-coffee')) {
+          showBrewingMessage();
+        }
+      });
+    });
+  </script>
+</body>
+</html>
